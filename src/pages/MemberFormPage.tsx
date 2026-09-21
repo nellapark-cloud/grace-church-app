@@ -4,6 +4,7 @@ import { createMember, getMember, updateMember } from '../lib/members'
 import { subscribeSettings } from '../lib/settings'
 import { DateField } from '../components/DateField'
 import { PhotoPicker } from '../components/PhotoPicker'
+import { AddressField } from '../components/AddressField'
 import {
   BAPTISM_TYPES,
   MEMBER_STATUSES,
@@ -133,10 +134,10 @@ export function MemberFormPage() {
             </div>
             <div className="sm:col-span-2">
               <label className={labelClass}>주소</label>
-              <input
+              <AddressField
                 value={form.address}
-                onChange={(e) => update('address', e.target.value)}
-                className={inputClass}
+                onChange={(v) => update('address', v)}
+                inputClassName={inputClass}
               />
             </div>
             <div className="sm:col-span-2">
