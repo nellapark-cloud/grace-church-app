@@ -1,16 +1,27 @@
-import { useState, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import { subscribePendingRegistrations } from '../lib/registrations'
 
 const navItems = [
   { to: '/', label: '재적부' },
   { to: '/members/new', label: '교인 등록' },
+  { to: '/approvals', label: '가입 승인' },
 ]
 
 export function Layout({ children }: { children: ReactNode }) {
   const { user, demo, logout } = useAuth()
   const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
+  const [pendingCount, setPendingCount] = useState(0)
+
+  useEffect(() => {
+    const unsubscribe = subscribePendingRegistrations(
+      (regs) => setPendingCount(regs.length),
+      () => {},
+    )
+    return unsubscribe
+  }, [])
 
   async function handleLogout() {
     await logout()
@@ -32,7 +43,7 @@ export function Layout({ children }: { children: ReactNode }) {
                   to={item.to}
                   end={item.to === '/'}
                   className={({ isActive }) =>
-                    `rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+                    `flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
                       isActive
                         ? 'bg-gray-900 text-white'
                         : 'text-gray-600 hover:bg-gray-100'
@@ -40,6 +51,11 @@ export function Layout({ children }: { children: ReactNode }) {
                   }
                 >
                   {item.label}
+                  {item.to === '/approvals' && pendingCount > 0 && (
+                    <span className="flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-semibold text-white">
+                      {pendingCount}
+                    </span>
+                  )}
                 </NavLink>
               ))}
             </nav>
@@ -84,7 +100,7 @@ export function Layout({ children }: { children: ReactNode }) {
                 end={item.to === '/'}
                 onClick={() => setMenuOpen(false)}
                 className={({ isActive }) =>
-                  `block rounded-md px-3 py-2 text-sm font-medium ${
+                  `flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium ${
                     isActive
                       ? 'bg-gray-900 text-white'
                       : 'text-gray-600 hover:bg-gray-100'
@@ -92,6 +108,11 @@ export function Layout({ children }: { children: ReactNode }) {
                 }
               >
                 {item.label}
+                {item.to === '/approvals' && pendingCount > 0 && (
+                  <span className="flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-semibold text-white">
+                    {pendingCount}
+                  </span>
+                )}
               </NavLink>
             ))}
             <div className="mt-1 flex items-center justify-between border-t border-gray-100 px-3 py-2">

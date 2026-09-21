@@ -3,15 +3,18 @@ import { AuthProvider } from './contexts/AuthContext'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { Layout } from './components/Layout'
 import { LoginPage } from './pages/LoginPage'
+import { RegisterPage } from './pages/RegisterPage'
 import { MembersPage } from './pages/MembersPage'
 import { MemberFormPage } from './pages/MemberFormPage'
 import { MemberDetailPage } from './pages/MemberDetailPage'
+import { ApprovalsPage } from './pages/ApprovalsPage'
 
 function App() {
   return (
     <AuthProvider>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
         <Route
           path="/*"
           element={
@@ -25,6 +28,7 @@ function App() {
                     path="/members/:id/edit"
                     element={<MemberFormPage />}
                   />
+                  <Route path="/approvals" element={<ApprovalsPage />} />
                   <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
               </Layout>

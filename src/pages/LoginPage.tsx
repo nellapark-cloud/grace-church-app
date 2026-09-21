@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react'
-import { Navigate, useLocation } from 'react-router-dom'
+import { Link, Navigate, useLocation } from 'react-router-dom'
 import { FirebaseError } from 'firebase/app'
 import { useAuth } from '../contexts/AuthContext'
 import { firebaseConfigured } from '../lib/firebase'
@@ -112,6 +112,13 @@ export function LoginPage() {
             {submitting ? '로그인 중...' : '로그인'}
           </button>
         </form>
+
+        <p className="mt-4 text-center text-sm text-gray-500">
+          교인이신가요?{' '}
+          <Link to="/register" className="font-medium text-gray-900 hover:underline">
+            등록 신청하기
+          </Link>
+        </p>
       </div>
     </div>
   )
