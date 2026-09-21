@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { createMember, getMember, updateMember } from '../lib/members'
 import { resizeImageToDataUrl } from '../lib/image'
 import { Avatar } from '../components/Avatar'
+import { DateField } from '../components/DateField'
 import {
   BAPTISM_TYPES,
   MEMBER_STATUSES,
@@ -13,10 +14,6 @@ import {
 
 const inputClass =
   'w-full rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900'
-// iOS Safari renders <input type="date"> with overlapping segments when the
-// font-size is below 16px, so date inputs need a larger text size.
-const dateInputClass =
-  'w-full rounded-md border border-gray-300 px-3 py-2 text-base outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900'
 const labelClass = 'mb-1 block text-sm font-medium text-gray-700'
 
 export function MemberFormPage() {
@@ -149,11 +146,10 @@ export function MemberFormPage() {
             </div>
             <div>
               <label className={labelClass}>생년월일</label>
-              <input
-                type="date"
+              <DateField
                 value={form.birthDate}
-                onChange={(e) => update('birthDate', e.target.value)}
-                className={dateInputClass}
+                onChange={(v) => update('birthDate', v)}
+                className={inputClass}
               />
             </div>
             <div>
@@ -207,13 +203,13 @@ export function MemberFormPage() {
             </div>
             <div>
               <label className={labelClass}>세례/침례</label>
-              <div className="flex gap-2">
+              <div className="flex flex-col gap-2 sm:flex-row">
                 <select
                   value={form.baptismType}
                   onChange={(e) =>
                     update('baptismType', e.target.value as BaptismType)
                   }
-                  className={`${inputClass} w-28 shrink-0`}
+                  className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 sm:w-28 sm:shrink-0"
                 >
                   <option value="">구분 없음</option>
                   {BAPTISM_TYPES.map((t) => (
@@ -222,21 +218,19 @@ export function MemberFormPage() {
                     </option>
                   ))}
                 </select>
-                <input
-                  type="date"
+                <DateField
                   value={form.baptismDate}
-                  onChange={(e) => update('baptismDate', e.target.value)}
-                  className={dateInputClass}
+                  onChange={(v) => update('baptismDate', v)}
+                  className={inputClass}
                 />
               </div>
             </div>
             <div>
               <label className={labelClass}>등록일</label>
-              <input
-                type="date"
+              <DateField
                 value={form.registeredDate}
-                onChange={(e) => update('registeredDate', e.target.value)}
-                className={dateInputClass}
+                onChange={(v) => update('registeredDate', v)}
+                className={inputClass}
               />
             </div>
             <div>

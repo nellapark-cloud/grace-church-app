@@ -3,14 +3,11 @@ import { Link } from 'react-router-dom'
 import { submitRegistration } from '../lib/registrations'
 import { resizeImageToDataUrl } from '../lib/image'
 import { Avatar } from '../components/Avatar'
+import { DateField } from '../components/DateField'
 import { emptyRegistrationInput, type RegistrationInput } from '../types/registration'
 
 const inputClass =
   'w-full rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900'
-// iOS Safari renders <input type="date"> with overlapping segments when the
-// font-size is below 16px, so date inputs need a larger text size.
-const dateInputClass =
-  'w-full rounded-md border border-gray-300 px-3 py-2 text-base outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900'
 const labelClass = 'mb-1 block text-sm font-medium text-gray-700'
 
 export function RegisterPage() {
@@ -136,11 +133,10 @@ export function RegisterPage() {
             </div>
             <div>
               <label className={labelClass}>생년월일</label>
-              <input
-                type="date"
+              <DateField
                 value={form.birthDate}
-                onChange={(e) => update('birthDate', e.target.value)}
-                className={dateInputClass}
+                onChange={(v) => update('birthDate', v)}
+                className={inputClass}
               />
             </div>
             <div>
