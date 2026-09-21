@@ -7,6 +7,7 @@ const navItems = [
   { to: '/', label: '재적부' },
   { to: '/members/new', label: '교인 등록' },
   { to: '/approvals', label: '가입 승인' },
+  { to: '/settings', label: '설정' },
 ]
 
 export function Layout({ children }: { children: ReactNode }) {

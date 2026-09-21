@@ -8,6 +8,7 @@ import { MembersPage } from './pages/MembersPage'
 import { MemberFormPage } from './pages/MemberFormPage'
 import { MemberDetailPage } from './pages/MemberDetailPage'
 import { ApprovalsPage } from './pages/ApprovalsPage'
+import { SettingsPage } from './pages/SettingsPage'
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
                     element={<MemberFormPage />}
                   />
                   <Route path="/approvals" element={<ApprovalsPage />} />
+                  <Route path="/settings" element={<SettingsPage />} />
                   <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
               </Layout>

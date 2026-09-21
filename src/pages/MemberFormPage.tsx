@@ -1,7 +1,8 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { createMember, getMember, updateMember } from '../lib/members'
 import { resizeImageToDataUrl } from '../lib/image'
+import { subscribeSettings } from '../lib/settings'
 import { Avatar } from '../components/Avatar'
 import { DateField } from '../components/DateField'
 import {
@@ -11,6 +12,7 @@ import {
   type BaptismType,
   type MemberInput,
 } from '../types/member'
+import { defaultSettings, type AppSettings } from '../types/settings'
 
 const inputClass =
   'w-full rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900'
@@ -26,6 +28,12 @@ export function MemberFormPage() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [photoError, setPhotoError] = useState('')
+  const [settings, setSettings] = useState<AppSettings>(defaultSettings)
+
+  useEffect(() => {
+    const unsubscribe = subscribeSettings(setSettings, () => {})
+    return unsubscribe
+  }, [])
 
   useEffect(() => {
     if (!id) return
@@ -182,24 +190,51 @@ export function MemberFormPage() {
         </section>
 
         <section>
-          <h2 className="mb-3 text-sm font-semibold text-gray-900">신앙정보</h2>
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="text-sm font-semibold text-gray-900">신앙정보</h2>
+            <Link
+              to="/settings"
+              className="text-xs text-gray-400 hover:text-gray-900 hover:underline"
+            >
+              직분/소속 목록 관리
+            </Link>
+          </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className={labelClass}>직분</label>
-              <input
+              <select
                 value={form.position}
                 onChange={(e) => update('position', e.target.value)}
-                placeholder="집사, 권사, 장로 등"
                 className={inputClass}
-              />
+              >
+                <option value="">선택 안 함</option>
+                {(form.position && !settings.positions.includes(form.position)
+                  ? [form.position, ...settings.positions]
+                  : settings.positions
+                ).map((p) => (
+                  <option key={p} value={p}>
+                    {p}
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
               <label className={labelClass}>소속 (구역/목장)</label>
-              <input
+              <select
                 value={form.group}
                 onChange={(e) => update('group', e.target.value)}
                 className={inputClass}
-              />
+              >
+                <option value="">선택 안 함</option>
+                {(form.group && !settings.groups.includes(form.group)
+                  ? [form.group, ...settings.groups]
+                  : settings.groups
+                ).map((g) => (
+                  <option key={g} value={g}>
+                    {g}
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
               <label className={labelClass}>세례/침례</label>
