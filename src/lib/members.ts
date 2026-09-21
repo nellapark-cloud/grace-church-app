@@ -1,7 +1,7 @@
 import { firebaseConfigured } from './firebase'
 import * as remote from './remoteMembers'
 import * as local from './localMembers'
-import type { Member, MemberInput } from '../types/member'
+import type { FamilyRelation, Member, MemberInput } from '../types/member'
 
 const impl = firebaseConfigured ? remote : local
 
@@ -10,6 +10,10 @@ export function subscribeMembers(
   onError: (error: Error) => void,
 ) {
   return impl.subscribeMembers(onChange, onError)
+}
+
+export function listAllMembers() {
+  return impl.listAllMembers()
 }
 
 export function createMember(input: MemberInput) {
@@ -28,6 +32,18 @@ export function getMember(id: string) {
   return impl.getMember(id)
 }
 
-export function getFamilyMembers(familyName: string, excludeId: string) {
-  return impl.getFamilyMembers(familyName, excludeId)
+export function getMembersByIds(ids: string[]) {
+  return impl.getMembersByIds(ids)
+}
+
+export function linkFamilyMember(
+  memberId: string,
+  targetId: string,
+  relation: FamilyRelation,
+) {
+  return impl.linkFamilyMember(memberId, targetId, relation)
+}
+
+export function unlinkFamilyMember(memberId: string, targetId: string) {
+  return impl.unlinkFamilyMember(memberId, targetId)
 }

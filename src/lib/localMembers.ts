@@ -1,4 +1,10 @@
-import type { Member, MemberInput } from '../types/member'
+import {
+  RECIPROCAL_RELATION,
+  type FamilyLink,
+  type FamilyRelation,
+  type Member,
+  type MemberInput,
+} from '../types/member'
 
 const STORAGE_KEY = 'grace-church-demo-members'
 
@@ -7,7 +13,7 @@ const listeners = new Set<Listener>()
 
 function seedData(): Member[] {
   const now = Date.now()
-  const base: Omit<Member, 'id' | 'createdAt' | 'updatedAt'>[] = [
+  const base: Omit<Member, 'id' | 'createdAt' | 'updatedAt' | 'familyLinks'>[] = [
     {
       name: '김은혜',
       gender: '여',
@@ -20,8 +26,7 @@ function seedData(): Member[] {
       group: '1구역',
       registeredDate: '2005-01-09',
       status: '재적',
-      familyName: '김은혜 가정',
-      familyRole: '세대주',
+      photoUrl: '',
       memo: '',
     },
     {
@@ -36,8 +41,7 @@ function seedData(): Member[] {
       group: '1구역',
       registeredDate: '2005-01-09',
       status: '재적',
-      familyName: '김은혜 가정',
-      familyRole: '배우자',
+      photoUrl: '',
       memo: '',
     },
     {
@@ -52,8 +56,7 @@ function seedData(): Member[] {
       group: '2구역',
       registeredDate: '2010-03-14',
       status: '재적',
-      familyName: '',
-      familyRole: '',
+      photoUrl: '',
       memo: '',
     },
     {
@@ -68,8 +71,7 @@ function seedData(): Member[] {
       group: '2구역',
       registeredDate: '2022-06-01',
       status: '휴면',
-      familyName: '',
-      familyRole: '',
+      photoUrl: '',
       memo: '타지역 이주로 출석 저조',
     },
     {
@@ -84,17 +86,20 @@ function seedData(): Member[] {
       group: '3구역',
       registeredDate: '1999-11-20',
       status: '재적',
-      familyName: '',
-      familyRole: '',
+      photoUrl: '',
       memo: '',
     },
   ]
-  return base.map((m, i) => ({
+  const members = base.map((m, i) => ({
     id: `demo-${i}`,
     ...m,
+    familyLinks: [] as FamilyLink[],
     createdAt: now,
     updatedAt: now,
   }))
+  members[0].familyLinks = [{ memberId: 'demo-1', relation: '배우자' }]
+  members[1].familyLinks = [{ memberId: 'demo-0', relation: '배우자' }]
+  return members
 }
 
 function readAll(): Member[] {
@@ -130,6 +135,10 @@ export function subscribeMembers(
   }
 }
 
+export async function listAllMembers(): Promise<Member[]> {
+  return sortByName(readAll())
+}
+
 export async function createMember(input: MemberInput) {
   const all = readAll()
   const now = Date.now()
@@ -137,7 +146,7 @@ export async function createMember(input: MemberInput) {
     typeof crypto !== 'undefined' && 'randomUUID' in crypto
       ? crypto.randomUUID()
       : `local-${now}-${Math.random().toString(36).slice(2)}`
-  all.push({ id, ...input, createdAt: now, updatedAt: now })
+  all.push({ id, ...input, familyLinks: [], createdAt: now, updatedAt: now })
   writeAll(all)
 }
 
@@ -157,11 +166,44 @@ export async function getMember(id: string): Promise<Member | null> {
   return readAll().find((m) => m.id === id) ?? null
 }
 
-export async function getFamilyMembers(
-  familyName: string,
-  excludeId: string,
-): Promise<Member[]> {
-  return readAll().filter(
-    (m) => m.familyName === familyName && m.id !== excludeId,
-  )
+export async function getMembersByIds(ids: string[]): Promise<Member[]> {
+  const idSet = new Set(ids)
+  return readAll().filter((m) => idSet.has(m.id))
+}
+
+function addLink(links: FamilyLink[], link: FamilyLink): FamilyLink[] {
+  return [...links.filter((l) => l.memberId !== link.memberId), link]
+}
+
+function removeLink(links: FamilyLink[], memberId: string): FamilyLink[] {
+  return links.filter((l) => l.memberId !== memberId)
+}
+
+export async function linkFamilyMember(
+  memberId: string,
+  targetId: string,
+  relation: FamilyRelation,
+) {
+  const all = readAll()
+  const member = all.find((m) => m.id === memberId)
+  const target = all.find((m) => m.id === targetId)
+  if (!member || !target) return
+  member.familyLinks = addLink(member.familyLinks ?? [], {
+    memberId: targetId,
+    relation,
+  })
+  target.familyLinks = addLink(target.familyLinks ?? [], {
+    memberId,
+    relation: RECIPROCAL_RELATION[relation],
+  })
+  writeAll(all)
+}
+
+export async function unlinkFamilyMember(memberId: string, targetId: string) {
+  const all = readAll()
+  const member = all.find((m) => m.id === memberId)
+  const target = all.find((m) => m.id === targetId)
+  if (member) member.familyLinks = removeLink(member.familyLinks ?? [], targetId)
+  if (target) target.familyLinks = removeLink(target.familyLinks ?? [], memberId)
+  writeAll(all)
 }

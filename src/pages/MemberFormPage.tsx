@@ -1,6 +1,8 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { createMember, getMember, updateMember } from '../lib/members'
+import { resizeImageToDataUrl } from '../lib/image'
+import { Avatar } from '../components/Avatar'
 import {
   MEMBER_STATUSES,
   emptyMemberInput,
@@ -20,6 +22,7 @@ export function MemberFormPage() {
   const [loading, setLoading] = useState(isEdit)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const [photoError, setPhotoError] = useState('')
 
   useEffect(() => {
     if (!id) return
@@ -37,6 +40,19 @@ export function MemberFormPage() {
 
   function update<K extends keyof MemberInput>(key: K, value: MemberInput[K]) {
     setForm((f) => ({ ...f, [key]: value }))
+  }
+
+  async function handlePhotoChange(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    setPhotoError('')
+    try {
+      const dataUrl = await resizeImageToDataUrl(file)
+      update('photoUrl', dataUrl)
+    } catch {
+      setPhotoError('사진을 처리하지 못했습니다. 다른 파일로 시도해주세요.')
+    }
   }
 
   async function handleSubmit(e: FormEvent) {
@@ -74,6 +90,36 @@ export function MemberFormPage() {
       >
         <section>
           <h2 className="mb-3 text-sm font-semibold text-gray-900">기본정보</h2>
+          <div className="mb-4 flex items-center gap-4">
+            <Avatar name={form.name || '?'} photoUrl={form.photoUrl} size="lg" />
+            <div>
+              <label
+                htmlFor="photo-input"
+                className="inline-block cursor-pointer rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-50"
+              >
+                사진 선택
+              </label>
+              <input
+                id="photo-input"
+                type="file"
+                accept="image/*"
+                onChange={handlePhotoChange}
+                className="hidden"
+              />
+              {form.photoUrl && (
+                <button
+                  type="button"
+                  onClick={() => update('photoUrl', '')}
+                  className="ml-2 text-sm text-gray-400 hover:text-red-600"
+                >
+                  제거
+                </button>
+              )}
+              {photoError && (
+                <p className="mt-1 text-xs text-red-600">{photoError}</p>
+              )}
+            </div>
+          </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className={labelClass}>이름 *</label>
@@ -186,30 +232,6 @@ export function MemberFormPage() {
                   </option>
                 ))}
               </select>
-            </div>
-          </div>
-        </section>
-
-        <section>
-          <h2 className="mb-3 text-sm font-semibold text-gray-900">가족관계</h2>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div>
-              <label className={labelClass}>가족(세대) 이름</label>
-              <input
-                value={form.familyName}
-                onChange={(e) => update('familyName', e.target.value)}
-                placeholder="예: 김철수 가정"
-                className={inputClass}
-              />
-            </div>
-            <div>
-              <label className={labelClass}>가족 내 관계</label>
-              <input
-                value={form.familyRole}
-                onChange={(e) => update('familyRole', e.target.value)}
-                placeholder="세대주, 배우자, 자녀 등"
-                className={inputClass}
-              />
             </div>
           </div>
         </section>

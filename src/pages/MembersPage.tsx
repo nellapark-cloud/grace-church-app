@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { subscribeMembers } from '../lib/members'
+import { Avatar } from '../components/Avatar'
 import { MEMBER_STATUSES, type Member, type MemberStatus } from '../types/member'
 
 const statusStyles: Record<MemberStatus, string> = {
@@ -124,6 +125,7 @@ export function MembersPage() {
             <table className="w-full text-left text-sm">
               <thead className="border-b border-gray-200 bg-gray-50 text-xs text-gray-500">
                 <tr>
+                  <th className="w-10 px-4 py-2.5"></th>
                   <th className="px-4 py-2.5 font-medium">이름</th>
                   <th className="px-4 py-2.5 font-medium">직분</th>
                   <th className="px-4 py-2.5 font-medium">소속</th>
@@ -134,6 +136,9 @@ export function MembersPage() {
               <tbody className="divide-y divide-gray-100">
                 {filtered.map((m) => (
                   <tr key={m.id} className="hover:bg-gray-50">
+                    <td className="px-4 py-2.5">
+                      <Avatar name={m.name} photoUrl={m.photoUrl} size="sm" />
+                    </td>
                     <td className="px-4 py-2.5">
                       <Link
                         to={`/members/${m.id}`}
@@ -176,13 +181,16 @@ export function MembersPage() {
                 className="rounded-lg border border-gray-200 bg-white p-3.5 active:bg-gray-50"
               >
                 <div className="flex items-center justify-between">
-                  <div>
-                    <span className="font-medium text-gray-900">
-                      {m.name}
-                    </span>
-                    <span className="ml-1.5 text-xs text-gray-400">
-                      {m.gender}
-                    </span>
+                  <div className="flex items-center gap-2.5">
+                    <Avatar name={m.name} photoUrl={m.photoUrl} size="sm" />
+                    <div>
+                      <span className="font-medium text-gray-900">
+                        {m.name}
+                      </span>
+                      <span className="ml-1.5 text-xs text-gray-400">
+                        {m.gender}
+                      </span>
+                    </div>
                   </div>
                   <span
                     className={`rounded-full border px-2 py-0.5 text-xs font-medium ${statusStyles[m.status]}`}
@@ -190,7 +198,7 @@ export function MembersPage() {
                     {m.status}
                   </span>
                 </div>
-                <p className="mt-1 text-xs text-gray-500">
+                <p className="mt-1.5 text-xs text-gray-500">
                   {[m.position, m.group].filter(Boolean).join(' · ') || '-'}
                 </p>
                 <p className="mt-0.5 text-xs text-gray-500">
