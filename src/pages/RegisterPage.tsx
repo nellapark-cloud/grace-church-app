@@ -38,7 +38,7 @@ export function RegisterPage() {
 
   if (done) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
+      <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-[env(safe-area-inset-top)]">
         <div className="w-full max-w-sm rounded-lg border border-gray-200 bg-white p-6 text-center shadow-sm">
           <h1 className="text-lg font-semibold text-gray-900">
             신청이 접수되었습니다
@@ -58,7 +58,7 @@ export function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 px-4 py-10">
+    <div className="min-h-screen bg-gray-50 px-4 pb-[calc(env(safe-area-inset-bottom)+2.5rem)] pt-[calc(env(safe-area-inset-top)+2.5rem)]">
       <div className="mx-auto max-w-lg">
         <div className="mb-6 text-center">
           <h1 className="text-xl font-semibold tracking-tight text-gray-900">
