@@ -1,54 +1,33 @@
-import {
-  addDoc,
-  collection,
-  deleteDoc,
-  doc,
-  onSnapshot,
-  orderBy,
-  query,
-  serverTimestamp,
-  updateDoc,
-} from 'firebase/firestore'
-import { db } from './firebase'
+import { firebaseConfigured } from './firebase'
+import * as remote from './remoteMembers'
+import * as local from './localMembers'
 import type { Member, MemberInput } from '../types/member'
 
-function membersCol() {
-  return collection(db, 'members')
-}
+const impl = firebaseConfigured ? remote : local
 
 export function subscribeMembers(
   onChange: (members: Member[]) => void,
   onError: (error: Error) => void,
 ) {
-  const q = query(membersCol(), orderBy('name'))
-  return onSnapshot(
-    q,
-    (snapshot) => {
-      const members = snapshot.docs.map((d) => ({
-        id: d.id,
-        ...(d.data() as Omit<Member, 'id'>),
-      }))
-      onChange(members)
-    },
-    onError,
-  )
+  return impl.subscribeMembers(onChange, onError)
 }
 
-export async function createMember(input: MemberInput) {
-  await addDoc(membersCol(), {
-    ...input,
-    createdAt: Date.now(),
-    updatedAt: serverTimestamp(),
-  })
+export function createMember(input: MemberInput) {
+  return impl.createMember(input)
 }
 
-export async function updateMember(id: string, input: MemberInput) {
-  await updateDoc(doc(db, 'members', id), {
-    ...input,
-    updatedAt: serverTimestamp(),
-  })
+export function updateMember(id: string, input: MemberInput) {
+  return impl.updateMember(id, input)
 }
 
-export async function deleteMember(id: string) {
-  await deleteDoc(doc(db, 'members', id))
+export function deleteMember(id: string) {
+  return impl.deleteMember(id)
+}
+
+export function getMember(id: string) {
+  return impl.getMember(id)
+}
+
+export function getFamilyMembers(familyName: string, excludeId: string) {
+  return impl.getFamilyMembers(familyName, excludeId)
 }

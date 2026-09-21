@@ -1,15 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import {
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  query,
-  where,
-} from 'firebase/firestore'
-import { db } from '../lib/firebase'
-import { deleteMember } from '../lib/members'
+import { deleteMember, getFamilyMembers, getMember } from '../lib/members'
 import type { Member } from '../types/member'
 
 const fieldRows: { label: string; key: keyof Member }[] = [
@@ -37,26 +28,16 @@ export function MemberDetailPage() {
   useEffect(() => {
     if (!id) return
     setLoading(true)
-    getDoc(doc(db, 'members', id))
-      .then(async (snap) => {
-        if (!snap.exists()) {
+    getMember(id)
+      .then(async (data) => {
+        if (!data) {
           setError('교인 정보를 찾을 수 없습니다.')
           return
         }
-        const data = { id: snap.id, ...(snap.data() as Omit<Member, 'id'>) }
         setMember(data)
 
         if (data.familyName) {
-          const q = query(
-            collection(db, 'members'),
-            where('familyName', '==', data.familyName),
-          )
-          const familySnap = await getDocs(q)
-          setFamily(
-            familySnap.docs
-              .map((d) => ({ id: d.id, ...(d.data() as Omit<Member, 'id'>) }))
-              .filter((m) => m.id !== data.id),
-          )
+          setFamily(await getFamilyMembers(data.familyName, data.id))
         }
       })
       .catch(() => setError('교인 정보를 불러오지 못했습니다.'))

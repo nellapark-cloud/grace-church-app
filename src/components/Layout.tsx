@@ -8,7 +8,7 @@ const navItems = [
 ]
 
 export function Layout({ children }: { children: ReactNode }) {
-  const { user, logout } = useAuth()
+  const { user, demo, logout } = useAuth()
   const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
 
@@ -47,12 +47,14 @@ export function Layout({ children }: { children: ReactNode }) {
 
           <div className="hidden items-center gap-3 sm:flex">
             <span className="text-xs text-gray-400">{user?.email}</span>
-            <button
-              onClick={handleLogout}
-              className="rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-100"
-            >
-              로그아웃
-            </button>
+            {!demo && (
+              <button
+                onClick={handleLogout}
+                className="rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-100"
+              >
+                로그아웃
+              </button>
+            )}
           </div>
 
           <button
@@ -94,16 +96,25 @@ export function Layout({ children }: { children: ReactNode }) {
             ))}
             <div className="mt-1 flex items-center justify-between border-t border-gray-100 px-3 py-2">
               <span className="text-xs text-gray-400">{user?.email}</span>
-              <button
-                onClick={handleLogout}
-                className="text-sm font-medium text-gray-600"
-              >
-                로그아웃
-              </button>
+              {!demo && (
+                <button
+                  onClick={handleLogout}
+                  className="text-sm font-medium text-gray-600"
+                >
+                  로그아웃
+                </button>
+              )}
             </div>
           </div>
         )}
       </header>
+
+      {demo && (
+        <div className="border-b border-amber-200 bg-amber-50 px-4 py-2 text-center text-xs text-amber-800 sm:px-6">
+          데모 모드 · 이 브라우저에만 저장되며 기기 간 공유되지 않습니다. 실제
+          운영하려면 README를 참고해 Firebase를 연결하세요.
+        </div>
+      )}
 
       <main className="mx-auto max-w-5xl px-4 py-6 sm:px-6">{children}</main>
     </div>

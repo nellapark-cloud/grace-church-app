@@ -1,12 +1,9 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { doc, getDoc } from 'firebase/firestore'
-import { db } from '../lib/firebase'
-import { createMember, updateMember } from '../lib/members'
+import { createMember, getMember, updateMember } from '../lib/members'
 import {
   MEMBER_STATUSES,
   emptyMemberInput,
-  type Member,
   type MemberInput,
 } from '../types/member'
 
@@ -26,10 +23,9 @@ export function MemberFormPage() {
 
   useEffect(() => {
     if (!id) return
-    getDoc(doc(db, 'members', id))
-      .then((snap) => {
-        if (snap.exists()) {
-          const data = snap.data() as Omit<Member, 'id'>
+    getMember(id)
+      .then((data) => {
+        if (data) {
           setForm({ ...emptyMemberInput, ...data })
         } else {
           setError('교인 정보를 찾을 수 없습니다.')
