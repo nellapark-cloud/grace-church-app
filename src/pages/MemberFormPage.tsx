@@ -4,8 +4,10 @@ import { createMember, getMember, updateMember } from '../lib/members'
 import { resizeImageToDataUrl } from '../lib/image'
 import { Avatar } from '../components/Avatar'
 import {
+  BAPTISM_TYPES,
   MEMBER_STATUSES,
   emptyMemberInput,
+  type BaptismType,
   type MemberInput,
 } from '../types/member'
 
@@ -200,13 +202,29 @@ export function MemberFormPage() {
               />
             </div>
             <div>
-              <label className={labelClass}>세례일</label>
-              <input
-                type="date"
-                value={form.baptismDate}
-                onChange={(e) => update('baptismDate', e.target.value)}
-                className={inputClass}
-              />
+              <label className={labelClass}>세례/침례</label>
+              <div className="flex gap-2">
+                <select
+                  value={form.baptismType}
+                  onChange={(e) =>
+                    update('baptismType', e.target.value as BaptismType)
+                  }
+                  className={`${inputClass} w-28 shrink-0`}
+                >
+                  <option value="">구분 없음</option>
+                  {BAPTISM_TYPES.map((t) => (
+                    <option key={t} value={t}>
+                      {t}
+                    </option>
+                  ))}
+                </select>
+                <input
+                  type="date"
+                  value={form.baptismDate}
+                  onChange={(e) => update('baptismDate', e.target.value)}
+                  className={inputClass}
+                />
+              </div>
             </div>
             <div>
               <label className={labelClass}>등록일</label>

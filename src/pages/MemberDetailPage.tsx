@@ -19,7 +19,6 @@ const fieldRows: { label: string; key: keyof Member }[] = [
   { label: '이메일', key: 'email' },
   { label: '직분', key: 'position' },
   { label: '소속(구역/목장)', key: 'group' },
-  { label: '세례일', key: 'baptismDate' },
   { label: '등록일', key: 'registeredDate' },
   { label: '비고', key: 'memo' },
 ]
@@ -143,7 +142,23 @@ export function MemberDetailPage() {
 
       <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
         <dl className="divide-y divide-gray-100 text-sm">
-          {fieldRows.map(({ label, key }) => (
+          {fieldRows.slice(0, 6).map(({ label, key }) => (
+            <div key={key} className="grid grid-cols-3 gap-4 px-4 py-3">
+              <dt className="text-gray-500">{label}</dt>
+              <dd className="col-span-2 text-gray-900">
+                {(member[key] as string) || '-'}
+              </dd>
+            </div>
+          ))}
+          <div className="grid grid-cols-3 gap-4 px-4 py-3">
+            <dt className="text-gray-500">세례/침례</dt>
+            <dd className="col-span-2 text-gray-900">
+              {member.baptismType
+                ? `${member.baptismType}${member.baptismDate ? ` · ${member.baptismDate}` : ''}`
+                : '-'}
+            </dd>
+          </div>
+          {fieldRows.slice(6).map(({ label, key }) => (
             <div key={key} className="grid grid-cols-3 gap-4 px-4 py-3">
               <dt className="text-gray-500">{label}</dt>
               <dd className="col-span-2 text-gray-900">

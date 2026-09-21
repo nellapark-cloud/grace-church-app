@@ -2,6 +2,10 @@ export type MemberStatus = '재적' | '휴면' | '이명' | '소천'
 
 export type MemberGender = '남' | '여'
 
+export type BaptismType = '' | '세례' | '침례'
+
+export const BAPTISM_TYPES: BaptismType[] = ['세례', '침례']
+
 export type FamilyRelation = '배우자' | '부모' | '자녀' | '형제자매' | '기타'
 
 export const FAMILY_RELATIONS: FamilyRelation[] = [
@@ -33,6 +37,7 @@ export interface Member {
   phone: string
   address: string
   email: string
+  baptismType: BaptismType
   baptismDate: string
   position: string
   group: string
@@ -59,6 +64,7 @@ export const emptyMemberInput: MemberInput = {
   phone: '',
   address: '',
   email: '',
+  baptismType: '',
   baptismDate: '',
   position: '',
   group: '',
