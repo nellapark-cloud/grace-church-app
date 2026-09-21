@@ -1,10 +1,9 @@
-import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { createMember, getMember, updateMember } from '../lib/members'
-import { resizeImageToDataUrl } from '../lib/image'
 import { subscribeSettings } from '../lib/settings'
-import { Avatar } from '../components/Avatar'
 import { DateField } from '../components/DateField'
+import { PhotoPicker } from '../components/PhotoPicker'
 import {
   BAPTISM_TYPES,
   MEMBER_STATUSES,
@@ -27,7 +26,6 @@ export function MemberFormPage() {
   const [loading, setLoading] = useState(isEdit)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
-  const [photoError, setPhotoError] = useState('')
   const [settings, setSettings] = useState<AppSettings>(defaultSettings)
 
   useEffect(() => {
@@ -51,19 +49,6 @@ export function MemberFormPage() {
 
   function update<K extends keyof MemberInput>(key: K, value: MemberInput[K]) {
     setForm((f) => ({ ...f, [key]: value }))
-  }
-
-  async function handlePhotoChange(e: ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    e.target.value = ''
-    if (!file) return
-    setPhotoError('')
-    try {
-      const dataUrl = await resizeImageToDataUrl(file)
-      update('photoUrl', dataUrl)
-    } catch {
-      setPhotoError('사진을 처리하지 못했습니다. 다른 파일로 시도해주세요.')
-    }
   }
 
   async function handleSubmit(e: FormEvent) {
@@ -101,35 +86,12 @@ export function MemberFormPage() {
       >
         <section>
           <h2 className="mb-3 text-sm font-semibold text-gray-900">기본정보</h2>
-          <div className="mb-4 flex items-center gap-4">
-            <Avatar name={form.name || '?'} photoUrl={form.photoUrl} size="lg" />
-            <div>
-              <label
-                htmlFor="photo-input"
-                className="inline-block cursor-pointer rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-50"
-              >
-                사진 선택
-              </label>
-              <input
-                id="photo-input"
-                type="file"
-                accept="image/*"
-                onChange={handlePhotoChange}
-                className="hidden"
-              />
-              {form.photoUrl && (
-                <button
-                  type="button"
-                  onClick={() => update('photoUrl', '')}
-                  className="ml-2 text-sm text-gray-400 hover:text-red-600"
-                >
-                  제거
-                </button>
-              )}
-              {photoError && (
-                <p className="mt-1 text-xs text-red-600">{photoError}</p>
-              )}
-            </div>
+          <div className="mb-4">
+            <PhotoPicker
+              name={form.name}
+              photoUrl={form.photoUrl}
+              onChange={(url) => update('photoUrl', url)}
+            />
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>

@@ -1,9 +1,8 @@
-import { useState, type ChangeEvent, type FormEvent } from 'react'
+import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { submitRegistration } from '../lib/registrations'
-import { resizeImageToDataUrl } from '../lib/image'
-import { Avatar } from '../components/Avatar'
 import { DateField } from '../components/DateField'
+import { PhotoPicker } from '../components/PhotoPicker'
 import { emptyRegistrationInput, type RegistrationInput } from '../types/registration'
 
 const inputClass =
@@ -15,26 +14,12 @@ export function RegisterPage() {
   const [submitting, setSubmitting] = useState(false)
   const [done, setDone] = useState(false)
   const [error, setError] = useState('')
-  const [photoError, setPhotoError] = useState('')
 
   function update<K extends keyof RegistrationInput>(
     key: K,
     value: RegistrationInput[K],
   ) {
     setForm((f) => ({ ...f, [key]: value }))
-  }
-
-  async function handlePhotoChange(e: ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    e.target.value = ''
-    if (!file) return
-    setPhotoError('')
-    try {
-      const dataUrl = await resizeImageToDataUrl(file)
-      update('photoUrl', dataUrl)
-    } catch {
-      setPhotoError('사진을 처리하지 못했습니다. 다른 파일로 시도해주세요.')
-    }
   }
 
   async function handleSubmit(e: FormEvent) {
@@ -88,27 +73,11 @@ export function RegisterPage() {
           onSubmit={handleSubmit}
           className="space-y-4 rounded-lg border border-gray-200 bg-white p-5 shadow-sm"
         >
-          <div className="flex items-center gap-4">
-            <Avatar name={form.name || '?'} photoUrl={form.photoUrl} size="lg" />
-            <div>
-              <label
-                htmlFor="reg-photo-input"
-                className="inline-block cursor-pointer rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-50"
-              >
-                사진 선택
-              </label>
-              <input
-                id="reg-photo-input"
-                type="file"
-                accept="image/*"
-                onChange={handlePhotoChange}
-                className="hidden"
-              />
-              {photoError && (
-                <p className="mt-1 text-xs text-red-600">{photoError}</p>
-              )}
-            </div>
-          </div>
+          <PhotoPicker
+            name={form.name}
+            photoUrl={form.photoUrl}
+            onChange={(url) => update('photoUrl', url)}
+          />
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
