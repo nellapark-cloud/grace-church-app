@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react'
 import { Link } from 'react-router-dom'
-import { subscribeMembers } from '../lib/members'
+import { createMember, subscribeMembers } from '../lib/members'
+import { csvToMemberInputs, downloadCsv, membersToCsv } from '../lib/csv'
 import { Avatar } from '../components/Avatar'
 import { MEMBER_STATUSES, type Member, type MemberStatus } from '../types/member'
 
@@ -20,6 +21,9 @@ export function MembersPage() {
     '전체',
   )
   const [groupFilter, setGroupFilter] = useState('전체')
+  const [importing, setImporting] = useState(false)
+  const [importResult, setImportResult] = useState('')
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     const unsubscribe = subscribeMembers(
@@ -54,6 +58,53 @@ export function MembersPage() {
     })
   }, [members, search, statusFilter, groupFilter])
 
+  function handleExport() {
+    const csv = membersToCsv(filtered)
+    const date = new Date().toISOString().slice(0, 10)
+    downloadCsv(`재적부_${date}.csv`, csv)
+  }
+
+  async function handleImportFile(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+
+    const text = await file.text()
+    const { members: rows, errors } = csvToMemberInputs(text)
+
+    if (rows.length === 0) {
+      setImportResult(
+        errors.length > 0
+          ? `가져올 수 있는 행이 없습니다. (${errors[0].reason})`
+          : '가져올 수 있는 행이 없습니다.',
+      )
+      return
+    }
+
+    const proceed = confirm(
+      `${rows.length}명을 추가합니다.${
+        errors.length > 0 ? ` (${errors.length}행은 건너뜀)` : ''
+      }\n계속할까요?`,
+    )
+    if (!proceed) return
+
+    setImporting(true)
+    setImportResult('')
+    try {
+      for (const input of rows) {
+        await createMember(input)
+      }
+      setImportResult(
+        `${rows.length}명 추가 완료` +
+          (errors.length > 0 ? ` · ${errors.length}행 건너뜀` : ''),
+      )
+    } catch {
+      setImportResult('가져오는 중 오류가 발생했습니다.')
+    } finally {
+      setImporting(false)
+    }
+  }
+
   return (
     <div>
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
@@ -63,13 +114,43 @@ export function MembersPage() {
             전체 {members.length}명 · 조회 {filtered.length}명
           </p>
         </div>
-        <Link
-          to="/members/new"
-          className="rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white hover:bg-gray-800"
-        >
-          + 교인 등록
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={handleExport}
+            className="rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50"
+          >
+            엑셀로 내보내기
+          </button>
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={importing}
+            className="rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50"
+          >
+            {importing ? '가져오는 중...' : '엑셀로 가져오기'}
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".csv"
+            onChange={handleImportFile}
+            className="hidden"
+          />
+          <Link
+            to="/members/new"
+            className="rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white hover:bg-gray-800"
+          >
+            + 교인 등록
+          </Link>
+        </div>
       </div>
+
+      {importResult && (
+        <p className="mb-4 rounded-md bg-gray-50 px-3 py-2 text-sm text-gray-600">
+          {importResult}
+        </p>
+      )}
 
       <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center">
         <input
