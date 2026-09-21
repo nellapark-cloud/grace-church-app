@@ -1,7 +1,7 @@
 {
-  "name": "교회 재적부",
-  "short_name": "재적부",
-  "description": "교회 교인 재적부 관리 앱",
+  "name": "은혜교회 재적부",
+  "short_name": "은혜교회 재적부",
+  "description": "기독교한국침례회 은혜교회 재적부 관리 앱",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f9fafb",

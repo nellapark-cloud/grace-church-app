@@ -30,12 +30,12 @@ export function Layout({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="flex min-h-screen flex-col bg-gray-50">
       <header className="sticky top-0 z-10 border-b border-gray-200 bg-white/90 pt-[env(safe-area-inset-top)] backdrop-blur">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3 sm:px-6">
           <div className="flex items-center gap-6">
             <span className="text-base font-semibold tracking-tight text-gray-900">
-              교회 재적부
+              은혜교회 재적부
             </span>
             <nav className="hidden items-center gap-1 sm:flex">
               {navItems.map((item) => (
@@ -138,9 +138,13 @@ export function Layout({ children }: { children: ReactNode }) {
         </div>
       )}
 
-      <main className="mx-auto max-w-5xl px-4 py-6 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] sm:px-6">
+      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-6 sm:px-6">
         {children}
       </main>
+
+      <footer className="pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-3 text-center text-xs text-gray-400">
+        기독교한국침례회 은혜교회
+      </footer>
     </div>
   )
 }

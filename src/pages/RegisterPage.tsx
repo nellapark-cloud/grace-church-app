@@ -62,7 +62,7 @@ export function RegisterPage() {
       <div className="mx-auto max-w-lg">
         <div className="mb-6 text-center">
           <h1 className="text-xl font-semibold tracking-tight text-gray-900">
-            교인 등록 신청
+            은혜교회 교인 등록 신청
           </h1>
           <p className="mt-1 text-sm text-gray-500">
             신청하시면 관리자 확인 후 재적부에 등록됩니다.
@@ -157,6 +157,10 @@ export function RegisterPage() {
             {submitting ? '신청 중...' : '신청하기'}
           </button>
         </form>
+
+        <p className="mt-6 text-center text-xs text-gray-400">
+          기독교한국침례회 은혜교회
+        </p>
       </div>
     </div>
   )

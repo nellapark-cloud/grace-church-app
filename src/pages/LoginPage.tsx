@@ -59,7 +59,7 @@ export function LoginPage() {
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
           <h1 className="text-xl font-semibold tracking-tight text-gray-900">
-            교회 재적부
+            은혜교회 재적부
           </h1>
           <p className="mt-1 text-sm text-gray-500">관리자 로그인</p>
         </div>
@@ -118,6 +118,10 @@ export function LoginPage() {
           <Link to="/register" className="font-medium text-gray-900 hover:underline">
             등록 신청하기
           </Link>
+        </p>
+
+        <p className="mt-6 text-center text-xs text-gray-400">
+          기독교한국침례회 은혜교회
         </p>
       </div>
     </div>
